@@ -5,7 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 @Data
+@ParametersAreNonnullByDefault
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

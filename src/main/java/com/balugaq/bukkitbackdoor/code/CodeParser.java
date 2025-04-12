@@ -1,16 +1,23 @@
 package com.balugaq.bukkitbackdoor.code;
 
+import lombok.experimental.UtilityClass;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@UtilityClass
 public class CodeParser {
     public static final Pattern SETTINGS_PATTERN = Pattern.compile(
             "settings:\\[(([a-zA-Z0-9_]+=[a-zA-Z0-9_]),?)+\\]"
     );
 
+    @ParametersAreNonnullByDefault
+    @Nonnull
     public static Code parse(String rawCode) {
         Matcher matcher = SETTINGS_PATTERN.matcher(rawCode);
         Settings settings = new Settings();
@@ -28,6 +35,7 @@ public class CodeParser {
      *
      * @param string 设置字符串，格式为：settings:[key1=value1,key2=value2]
      */
+    @ParametersAreNonnullByDefault
     public static void parseSettings(String string, Settings dest) {
         Map<String, String> map = new HashMap<>();
         string = string.substring(8, string.length() - 1);

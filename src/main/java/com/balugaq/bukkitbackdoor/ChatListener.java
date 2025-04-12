@@ -12,6 +12,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +36,30 @@ public class ChatListener implements Listener {
         jShell.eval("import org.bukkit.*;");
     }
 
+    @ParametersAreNonnullByDefault
+    @Nonnull
+    private static String handleSettings(Settings settings, String code) {
+        if (settings.isTimeit()) {
+            return generateTimedCode(code);
+        }
+        return code;
+    }
+
+    @ParametersAreNonnullByDefault
+    @Nonnull
+    private static String generateTimedCode(String code) {
+        return "long __timeit_start = System.currentTimeMillis(); " +
+                code + "; " +
+                "player.sendMessage(\"Time Taken: \" + (System.currentTimeMillis() - __timeit_start) + \"ms\");";
+    }
+
+    @ParametersAreNonnullByDefault
+    @Nonnull
+    private static String color(String string) {
+        return ChatColor.translateAlternateColorCodes('&', string);
+    }
+
+    @ParametersAreNonnullByDefault
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
         if (!event.getPlayer().isOp()) {
@@ -57,9 +83,10 @@ public class ChatListener implements Listener {
         loadReplacements(event);
 
         String rawCode = event.getMessage();
-        runCode(player, CodeParser.parse(rawCode), event);
+        runCode(player, CodeParser.parse(rawCode));
     }
 
+    @ParametersAreNonnullByDefault
     private void loadReplacements(AsyncPlayerChatEvent event) {
         replacements.clear(); // Clear previous replacements to avoid stale data
 
@@ -89,7 +116,8 @@ public class ChatListener implements Listener {
         }
     }
 
-    private void runCode(Player player, Code code, AsyncPlayerChatEvent event) {
+    @ParametersAreNonnullByDefault
+    private void runCode(Player player, Code code) {
         String finalCode = code.getCode();
         player.sendMessage(color(J_SHELL_PROMPT + finalCode));
         Settings settings = code.getSettings();
@@ -104,22 +132,5 @@ public class ChatListener implements Listener {
                 player.sendMessage(color(STACK_TRACE_PREFIX + element.toString()));
             });
         }
-    }
-
-    private String handleSettings(Settings settings, String code) {
-        if (settings.isTimeit()) {
-            return generateTimedCode(code);
-        }
-        return code;
-    }
-
-    private String generateTimedCode(String code) {
-        return "long __timeit_start = System.currentTimeMillis(); " +
-                code + "; " +
-                "player.sendMessage(\"Time Taken: \" + (System.currentTimeMillis() - __timeit_start) + \"ms\");";
-    }
-
-    private String color(String string) {
-        return ChatColor.translateAlternateColorCodes('&', string);
     }
 }

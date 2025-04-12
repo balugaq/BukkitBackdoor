@@ -5,11 +5,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
+// todo: ConfigManager, ListenerManager
 @Getter
 public class BukkitBackdoor extends JavaPlugin {
     @Getter
     public static BukkitBackdoor instance;
+    @Getter
     public ChatListener chatListener;
+    @Getter
     public DefaultConfig defaultConfig;
 
     @Override
@@ -26,6 +29,6 @@ public class BukkitBackdoor extends JavaPlugin {
     public void onDisable() {
         instance = null;
         HandlerList.unregisterAll(chatListener);
-
+        HandlerList.unregisterAll(defaultConfig);
     }
 }

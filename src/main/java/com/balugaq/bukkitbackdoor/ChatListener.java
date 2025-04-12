@@ -4,6 +4,12 @@ import com.balugaq.bukkitbackdoor.code.Code;
 import com.balugaq.bukkitbackdoor.code.CodeParser;
 import com.balugaq.bukkitbackdoor.code.Settings;
 import jdk.jshell.JShell;
+import jdk.jshell.Snippet;
+import jdk.jshell.SnippetEvent;
+import jdk.jshell.VarSnippet;
+import jdk.jshell.execution.FailOverExecutionControlProvider;
+import jdk.jshell.execution.JdiExecutionControlProvider;
+import jdk.jshell.execution.LocalExecutionControlProvider;
 import org.bukkit.ChatColor;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.entity.Player;
@@ -14,9 +20,12 @@ import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -29,11 +38,31 @@ public class ChatListener implements Listener {
 
     private final Set<UUID> jShellingPlayers = new HashSet<>();
     private final Map<String, Object> replacements = new HashMap<>();
-    private final JShell jShell = JShell.create();
+    private final JShell jShell;
 
     public ChatListener() {
         // Load all Bukkit classes by default
-        jShell.eval("import org.bukkit.*;");
+        JShell.Builder builder = JShell.builder()
+                .executionEngine(new JdiExecutionControlProvider(), Map.of());
+
+        jShell = builder.build();
+        try {
+            Class<?> clazz = Class.forName("org.bukkit.Bukkit");
+            String jarPath = clazz.getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .getPath();
+            jarPath = URLDecoder.decode(jarPath, StandardCharsets.UTF_8);
+            if (jarPath.startsWith("/")) {
+                jarPath = jarPath.substring(1);
+            }
+            Logger.log("jarPath: " + jarPath);
+            jShell.addToClasspath(jarPath);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        compile(jShell.eval("import org.bukkit.*;"));
     }
 
     @ParametersAreNonnullByDefault
@@ -80,6 +109,15 @@ public class ChatListener implements Listener {
             return;
         }
 
+        if (event.getMessage().equals("!!jshell")) {
+            // exit jShell
+            jShellingPlayers.remove(playerId);
+            player.sendMessage(color("&aJShell exited!"));
+            event.setCancelled(true);
+            return;
+        }
+
+        event.setCancelled(true);
         loadReplacements(event);
 
         String rawCode = event.getMessage();
@@ -106,9 +144,11 @@ public class ChatListener implements Listener {
             i++;
         }
 
+        // Can't affect at all, not passed an Object but a String
         for (Map.Entry<String, Object> entry : replacements.entrySet()) {
             try {
-                jShell.eval("var " + entry.getKey() + " = " + entry.getValue().toString());
+                jShell.varValue()
+                compile(jShell.eval("var " + entry.getKey() + " = " + entry.getValue() + ";"));
             } catch (Exception e) {
                 Logger.stackTrace(e);
                 event.getPlayer().sendMessage(color("&cError loading replacement variable: " + entry.getKey()));
@@ -122,9 +162,10 @@ public class ChatListener implements Listener {
         player.sendMessage(color(J_SHELL_PROMPT + finalCode));
         Settings settings = code.getSettings();
         finalCode = handleSettings(settings, finalCode);
+        finalCode += ";";
 
         try {
-            jShell.eval(finalCode);
+            compile(jShell.eval(finalCode));
         } catch (Throwable e) {
             Logger.stackTrace(e);
             player.sendMessage(color(ERROR_PREFIX + e.getMessage()));
@@ -132,5 +173,11 @@ public class ChatListener implements Listener {
                 player.sendMessage(color(STACK_TRACE_PREFIX + element.toString()));
             });
         }
+    }
+
+    public void compile(List<SnippetEvent> events) {
+        events.forEach(event -> {
+            Logger.log("Event: " + event);
+        });
     }
 }

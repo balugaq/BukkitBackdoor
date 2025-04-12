@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 @UtilityClass
 public class CodeParser {
     public static final Pattern SETTINGS_PATTERN = Pattern.compile(
-            "settings:\\[(([a-zA-Z0-9_]+=[a-zA-Z0-9_]),?)+\\]"
+            "settings:\\[([a-zA-Z0-9_]+=[a-zA-Z0-9_]+,?)+\\]"
     );
 
     @ParametersAreNonnullByDefault

@@ -4,7 +4,7 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class Superhead {
-    public static final String part1 = """
+    public static final String PART_1 = """
 
                  ___           ___           ___           ___
                 /\\  \\         /\\  \\         /\\  \\         /\\__\\
@@ -17,7 +17,7 @@ public class Superhead {
               \\:\\/:/  /        /:/  /     \\:\\  \\         |:|  |
                \\::/__/        /:/  /       \\:\\__\\        |:|  |
                 \\/__/         \\/__/         \\|__|         \\|__|""";
-    public static final String part2 = """
+    public static final String PART_2 = """
 
                  ___           ___           ___           ___
                 /\\  \\         /\\  \\         /\\  \\         /\\  \\
@@ -32,7 +32,7 @@ public class Superhead {
                 \\/__/         \\/__/         \\/__/         \\|__|""";
 
     public static void show() {
-        Logger.log(part1);
-        Logger.log(part2);
+        Logger.log(PART_1);
+        Logger.log(PART_2);
     }
 }

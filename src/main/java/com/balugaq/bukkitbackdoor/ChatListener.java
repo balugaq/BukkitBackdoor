@@ -37,7 +37,7 @@ import java.util.function.Consumer;
 
 public class ChatListener implements Listener {
     private static final String J_SHELL_START_MESSAGE = "&aJShell started!";
-    private static final String J_SHELL_PROMPT = "&cjshell> ";
+    private static final String J_SHELL_PROMPT = "&ajshell> ";
     private static final String ERROR_PREFIX = "&cAn error occurred when using JShell: ";
     private static final String STACK_TRACE_PREFIX = "    &cat ";
 
@@ -56,7 +56,7 @@ public class ChatListener implements Listener {
                 }, Map.of());
 
         jShell = builder.build();
-        getAllFiles(
+        forEachFiles(
                 BukkitBackdoor.getInstance().getDataFolder().getAbsoluteFile().toPath().resolveSibling("..").resolveSibling("..").resolve("libraries").normalize().toFile(),
                 ".jar",
                 path -> {
@@ -73,11 +73,8 @@ public class ChatListener implements Listener {
         Logger.log("Path: " + th);
         jShell.addToClasspath(th);
 
-        compile(jShell.eval("import org.bukkit.*;"));
-        compile(jShell.eval("import org.bukkit.inventory.*;"));
-        compile(jShell.eval("import org.bukkit.entity.*;"));
         BackdoorConstants.setObject("server", Bukkit.getServer());
-        compile(jShell.eval("import com.balugaq.bukkitbackdoor.code.BackdoorConstants"));
+        BackdoorConstants.setObject("jShell", jShell);
         Logger.log(BackdoorConstants.keys());
     }
 
@@ -174,10 +171,11 @@ public class ChatListener implements Listener {
         player.sendMessage(color(J_SHELL_PROMPT + finalCode));
         Settings settings = code.getSettings();
         finalCode = handleSettings(settings, finalCode);
+        finalCode = DefaultConfig.applyReplacements(finalCode);
         finalCode += ";";
 
         try {
-            compile(jShell.eval(finalCode));
+            check(jShell.eval(finalCode));
         } catch (Throwable e) {
             Logger.stackTrace(e);
             player.sendMessage(color(ERROR_PREFIX + e.getMessage()));
@@ -185,11 +183,17 @@ public class ChatListener implements Listener {
         }
     }
 
-    public void compile(List<SnippetEvent> events) {
-        events.forEach(event -> Logger.log("Event: " + event));
+    @ParametersAreNonnullByDefault
+    public void check(List<SnippetEvent> events) {
+        events.forEach(event -> {
+            if (event.exception() != null) {
+                Logger.error(ERROR_PREFIX + event);
+            }
+        });
     }
 
-    public static void getAllFiles(File dir, String suffix, Consumer<Path> consumer) {
+    @ParametersAreNonnullByDefault
+    public static void forEachFiles(File dir, String suffix, Consumer<Path> consumer) {
         if (dir.isDirectory()) {
             File[] files = dir.listFiles();
             if (files == null) {
@@ -198,7 +202,7 @@ public class ChatListener implements Listener {
 
             for (File file : files) {
                 if (file.isDirectory()) {
-                    getAllFiles(file, suffix, consumer);
+                    forEachFiles(file, suffix, consumer);
                 } else {
                     if (file.getName().endsWith(suffix)) {
                         consumer.accept(file.toPath());

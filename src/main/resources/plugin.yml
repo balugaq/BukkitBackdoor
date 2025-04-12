@@ -1,0 +1,7 @@
+name: BukkitBackdoor
+author: balugaq
+description: A Bukkit plugin
+main: com.balugaq.bukkitbackdoor.BukkitBackdoor
+website: https://github.com/balugaq/BukkitBackdoor
+version: ${project.version}
+api-version: 1.20

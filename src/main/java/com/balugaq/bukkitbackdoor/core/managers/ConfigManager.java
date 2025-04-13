@@ -1,5 +1,6 @@
 package com.balugaq.bukkitbackdoor.core.managers;
 
+import com.balugaq.bukkitbackdoor.utils.Logger;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -37,8 +38,12 @@ public class ConfigManager {
 
         if (!existingFile.exists()) {
             try {
+                if (!existingFile.getParentFile().exists()) {
+                    existingFile.getParentFile().mkdirs();
+                }
                 existingFile.createNewFile();
             } catch (IOException e) {
+                Logger.stackTrace(e);
                 return;
             }
         }
@@ -54,7 +59,7 @@ public class ConfigManager {
         try {
             existingConfig.save(existingFile);
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.stackTrace(e);
         }
     }
 

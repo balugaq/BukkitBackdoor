@@ -19,12 +19,14 @@ public class CodeParser {
     @ParametersAreNonnullByDefault
     @Nonnull
     public static Code parse(String rawCode) {
-        Matcher matcher = SETTINGS_PATTERN.matcher(rawCode);
         Settings settings = new Settings();
-        if (matcher.find()) {
-            String string = matcher.group(0);
-            parseSettings(string, settings);
-            rawCode = rawCode.substring(matcher.end());
+        if (rawCode.startsWith("settings:[")) {
+            Matcher matcher = SETTINGS_PATTERN.matcher(rawCode);
+            if (matcher.find()) {
+                String string = matcher.group(0);
+                parseSettings(string, settings);
+                rawCode = rawCode.substring(matcher.end());
+            }
         }
 
         return new Code(rawCode, settings);
@@ -37,7 +39,7 @@ public class CodeParser {
      */
     public static void parseSettings(String string, Settings dest) {
         Map<String, String> map = new HashMap<>();
-        string = string.substring(8, string.length() - 1);
+        string = string.substring(10, string.length() - 1);
         String[] pairs = string.split(",");
         for (String pair : pairs) {
             if (pair.isEmpty()) continue;

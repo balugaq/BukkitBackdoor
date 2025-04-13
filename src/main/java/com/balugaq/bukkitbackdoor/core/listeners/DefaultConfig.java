@@ -3,21 +3,19 @@ package com.balugaq.bukkitbackdoor.core.listeners;
 import com.balugaq.bukkitbackdoor.api.code.BackdoorConstants;
 import com.balugaq.bukkitbackdoor.api.code.Code;
 import com.balugaq.bukkitbackdoor.api.code.CodeParser;
+import com.balugaq.bukkitbackdoor.api.code.CodeRunner;
 import com.balugaq.bukkitbackdoor.api.code.CustomLoaderDelegate;
 import com.balugaq.bukkitbackdoor.api.code.Settings;
 import com.balugaq.bukkitbackdoor.api.objects.Pair;
 import com.balugaq.bukkitbackdoor.implementation.BukkitBackdoorPlugin;
-import com.balugaq.bukkitbackdoor.utils.Logger;
 import com.balugaq.bukkitbackdoor.utils.ReflectionUtils;
+import com.balugaq.bukkitbackdoor.utils.StringUtils;
 import com.balugaq.bukkitbackdoor.utils.Superhead;
 import com.google.common.base.Preconditions;
 import jdk.jshell.JShell;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -25,20 +23,21 @@ import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.server.ServerLoadEvent;
+import org.bukkit.inventory.ItemFactory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
-import org.bukkit.plugin.PluginManager;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.material.MaterialData;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.annotation.ParametersAreNullableByDefault;
 import java.io.File;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -49,6 +48,7 @@ import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -69,7 +69,7 @@ public class DefaultConfig implements Listener {
     @Getter
     private static final Map<String, String> replacements = new HashMap<>();
     @Getter
-    private static final Set<String> imports = new HashSet<>();
+    private static final List<String> imports = new ArrayList<>();
     private static boolean firstLoad = true;
 
     @ParametersAreNonnullByDefault
@@ -95,15 +95,27 @@ public class DefaultConfig implements Listener {
     }
 
     public static void loadAll() {
-        Bukkit.getScheduler().runTaskLater(BukkitBackdoorPlugin.getInstance(), () -> {
-            JShell jShell = (JShell) BackdoorConstants.getObject("jShell");
+        Bukkit.getScheduler().runTaskAsynchronously(BukkitBackdoorPlugin.getInstance(), () -> {
+            runCode("jshell");
             for (String s : imports) {
-                jShell.eval("import " + s);
+                runCode("import " + s);
             }
-        }, 20L);
+            runCode("?exit");
+            Bukkit.getOnlinePlayers().forEach(player -> {
+                if (player.isOp()) {
+                    player.sendMessage(StringUtils.J_SHELL_READY);
+                }
+            });
+        });
     }
 
     @ParametersAreNonnullByDefault
+    private static void runCode(String message) {
+        CodeRunner.runCode(CodeRunner.getJShell(), Bukkit.getConsoleSender(), CodeParser.parse(message));
+    }
+
+    @ParametersAreNonnullByDefault
+    @Nonnull
     public static String applyReplacements(String origin) {
         int retryTimes = 0;
         String before = origin;
@@ -138,7 +150,6 @@ public class DefaultConfig implements Listener {
 
         firstLoad = false;
 
-        Logger.log("DefaultConfig loading");
         addImports(
                 Bukkit.class, Server.class, BackdoorConstants.class, Player.class,
                 Block.class, Location.class, World.class, FluidCollisionMode.class,
@@ -147,13 +158,14 @@ public class DefaultConfig implements Listener {
                 Matcher.class, Collection.class, Collections.class, Preconditions.class,
                 CodeParser.class, Code.class, CustomLoaderDelegate.class,
                 Settings.class, ChatListener.class, DefaultConfig.class, Superhead.class,
-                BukkitScheduler.class, PluginManager.class, ItemStack.class, Material.class,
+                BukkitScheduler.class, Material.class, MaterialData.class,
                 Recipe.class, YamlConfiguration.class, File.class, Files.class,
                 Path.class, Paths.class, Class.class, Runnable.class,
                 Thread.class, Consumer.class, Function.class, Supplier.class,
                 Pair.class, ReflectionUtils.class, Field.class, Method.class,
                 Constructor.class, MethodHandle.class, MethodHandles.class, VarHandle.class,
-                MethodHandles.Lookup.class
+                ItemMeta.class, Enchantment.class, Color.class, Damageable.class,
+                ItemFactory.class, ItemStack.class
         );
         /*
          * Simplified macro definitions

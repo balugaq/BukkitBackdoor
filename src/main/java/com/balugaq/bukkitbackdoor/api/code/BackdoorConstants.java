@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.experimental.UtilityClass;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,8 +21,7 @@ public class BackdoorConstants {
         return mapping.get(key);
     }
 
-    @ParametersAreNonnullByDefault
-    public static void setMapping(String key, Object value) {
+    public static void setMapping(@Nonnull String key, @Nullable Object value) {
         mapping.put(key, value);
     }
 

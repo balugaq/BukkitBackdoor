@@ -90,7 +90,7 @@ public class ReflectionUtils {
         return null;
     }
 
-    public static @Nullable Method getMethod(Class<?> clazz, String methodName, Class<?> ... parameterTypes) {
+    public static @Nullable Method getMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
         while (clazz != Object.class) {
             for (Method method : clazz.getDeclaredMethods()) {
                 if (method.getName().equals(methodName) && method.getParameterTypes().length == parameterTypes.length) {

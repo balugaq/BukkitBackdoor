@@ -46,6 +46,20 @@ public class Logger {
     }
 
     @ParametersAreNonnullByDefault
+    public static void debug(Object... message) {
+        for (Object obj : message) {
+            debug(String.valueOf(obj));
+        }
+    }
+
+    @ParametersAreNonnullByDefault
+    public static void debug(String message) {
+        if (BukkitBackdoorPlugin.getInstance().getConfigManager().getBoolean("debug")) {
+            logger.info(message);
+        }
+    }
+
+    @ParametersAreNonnullByDefault
     public static void stackTrace(Throwable e) {
         e.printStackTrace();
     }

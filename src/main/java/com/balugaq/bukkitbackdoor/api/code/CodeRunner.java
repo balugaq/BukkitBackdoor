@@ -137,6 +137,8 @@ public class CodeRunner {
     }
 
     public static void warpedCheck(JShell jShell, String finalCode, CommandSender sender, String displayCode) {
+        Logger.debug(sender.getName() + " committed: " + displayCode);
+        Logger.debug("Formatted as: " + finalCode);
         try {
             check(jShell.eval(finalCode), sender, displayCode);
         } catch (Throwable e) {

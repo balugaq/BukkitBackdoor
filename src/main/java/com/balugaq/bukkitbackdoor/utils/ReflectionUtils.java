@@ -90,7 +90,7 @@ public class ReflectionUtils {
         return null;
     }
 
-    public static @Nullable Method getMethod(@Nonnull Class<?> clazz, String methodName, Class<?> @Nonnull ... parameterTypes) {
+    public static @Nullable Method getMethod(Class<?> clazz, String methodName, Class<?> ... parameterTypes) {
         while (clazz != Object.class) {
             for (Method method : clazz.getDeclaredMethods()) {
                 if (method.getName().equals(methodName) && method.getParameterTypes().length == parameterTypes.length) {
@@ -176,7 +176,7 @@ public class ReflectionUtils {
         }
     }
 
-    public static @Nullable Constructor<?> getConstructor(@Nonnull Class<?> clazz, Class<?>... parameterTypes) {
+    public static @Nullable Constructor<?> getConstructor(@Nonnull Class<?> clazz, @Nonnull Class<?>... parameterTypes) {
         try {
             return clazz.getDeclaredConstructor(parameterTypes);
         } catch (NoSuchMethodException e) {
@@ -186,7 +186,7 @@ public class ReflectionUtils {
     }
 
     @Nullable
-    public static Object invokeMethod(@Nonnull Object object, @Nonnull String methodName, Object @Nonnull ... args) {
+    public static Object invokeMethod(@Nonnull Object object, @Nonnull String methodName, @Nonnull Object... args) {
         try {
             Method method = getMethod(object.getClass(), methodName, args.length);
             if (method != null) {
@@ -200,7 +200,7 @@ public class ReflectionUtils {
     }
 
     @Nullable
-    public static Object invokeStaticMethod(@Nonnull Class<?> clazz, @Nonnull String methodName, Object @Nonnull ... args) {
+    public static Object invokeStaticMethod(@Nonnull Class<?> clazz, @Nonnull String methodName, @Nonnull Object... args) {
         try {
             Method method = getMethod(clazz, methodName, args.length);
             if (method != null) {

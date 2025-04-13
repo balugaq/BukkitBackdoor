@@ -11,6 +11,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Code {
-    public String code = ";";
-    public Settings settings = new Settings();
+    private String code = ";";
+    private Settings settings = new Settings();
 }

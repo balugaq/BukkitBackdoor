@@ -52,7 +52,7 @@ public class ChatListener implements Listener {
                 ".jar",
                 path -> {
                     try {
-                        Logger.log(StringUtils.HOOKED_MESSAGE + path.toString());
+                        Logger.log(StringUtils.HOOKED_PREFIX + path.toString());
                         jShell.addToClasspath(path.toString());
                     } catch (Throwable e) {
                         Logger.stackTrace(e);
@@ -61,7 +61,7 @@ public class ChatListener implements Listener {
         String th = this.getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
         th = URLDecoder.decode(th, StandardCharsets.UTF_8);
         th = th.substring(1);
-        Logger.log(StringUtils.HOOKED_MESSAGE + th);
+        Logger.log(StringUtils.HOOKED_PREFIX + th);
         // todo: load all jars with config-controlled folders / files (include, exclude)
         jShell.addToClasspath(th);
 
@@ -122,7 +122,7 @@ public class ChatListener implements Listener {
         if (event.getMessage().equals("!!jshell")) {
             // exit jShell
             jShellingPlayers.remove(playerId);
-            player.sendMessage(StringUtils.color("&aJShell exited!"));
+            player.sendMessage(StringUtils.color(StringUtils.J_SHELL_EXIT_MESSAGE));
             event.setCancelled(true);
             return;
         }

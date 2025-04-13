@@ -13,6 +13,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @AllArgsConstructor
 @Builder
 public class Settings {
-    public boolean timeit = false;
-    public boolean sync = false;
+    private boolean timeit = false;
+    private boolean sync = false;
 }

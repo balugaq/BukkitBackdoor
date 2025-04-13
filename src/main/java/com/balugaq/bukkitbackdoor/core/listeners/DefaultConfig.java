@@ -7,6 +7,7 @@ import com.balugaq.bukkitbackdoor.api.code.CustomLoaderDelegate;
 import com.balugaq.bukkitbackdoor.api.code.Settings;
 import com.balugaq.bukkitbackdoor.api.objects.Pair;
 import com.balugaq.bukkitbackdoor.implementation.BukkitBackdoorPlugin;
+import com.balugaq.bukkitbackdoor.utils.Logger;
 import com.balugaq.bukkitbackdoor.utils.ReflectionUtils;
 import com.balugaq.bukkitbackdoor.utils.Superhead;
 import com.google.common.base.Preconditions;
@@ -27,6 +28,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
@@ -62,11 +64,13 @@ import java.util.regex.Pattern;
 
 @Getter
 public class DefaultConfig implements Listener {
-    public static final Pattern ALIAS_PATTERN = Pattern.compile("[a-zA-Z0-9]+=\\w+");
+    public static final Pattern ALIAS_PATTERN = Pattern.compile("([a-zA-Z0-9.,() +\\-*/;<>?:%\\n\\t])+=([a-zA-Z0-9.,() +\\-*/;<>?:%\\n\\t])+");
+    public static final int MAX_REPLACEMENT_RETRY_TIMES = 10;
     @Getter
     private static final Map<String, String> replacements = new HashMap<>();
     @Getter
     private static final Set<String> imports = new HashSet<>();
+    private static boolean firstLoad = true;
 
     @ParametersAreNonnullByDefault
     public static void addAlias(String s) {
@@ -91,35 +95,57 @@ public class DefaultConfig implements Listener {
     }
 
     public static void loadAll() {
-        JShell jShell = (JShell) BackdoorConstants.getObject("jShell");
-        for (String s : imports) {
-            jShell.eval("import " + s);
-        }
+        Bukkit.getScheduler().runTaskLater(BukkitBackdoorPlugin.getInstance(), () -> {
+            JShell jShell = (JShell) BackdoorConstants.getObject("jShell");
+            for (String s : imports) {
+                jShell.eval("import " + s);
+            }
+        }, 20L);
     }
 
     @ParametersAreNonnullByDefault
     public static String applyReplacements(String origin) {
-        for (Map.Entry<String, String> entry : replacements.entrySet()) {
-            String regex = entry.getKey() + "?([.() +\\-*/;<>?:%\\n\\t])"; // 假设为 key = player, origin = player.getPlayer(player)
-            // 将 player 替换为 value, 最后一个字符 ) 和 . 保留
-            origin = origin.replaceFirst(regex, entry.getValue() + "$1");
-        }
+        int retryTimes = 0;
+        String before = origin;
+        do {
+            if (retryTimes >= MAX_REPLACEMENT_RETRY_TIMES) {
+                break;
+            }
+
+            for (Map.Entry<String, String> entry : replacements.entrySet()) {
+                // 假设为 key = player, origin = player.getPlayer(player)
+                String regex = entry.getKey() + "?([.,() +\\-*/;<>?:%\\n\\t])";
+                // 将 player 替换为 value, 最后一个字符 ) 和 . 保留
+                origin = origin.replaceFirst(regex, entry.getValue() + "$1");
+            }
+            retryTimes++;
+        } while (!before.equals(origin));
 
         return origin;
     }
 
     @EventHandler
     @ParametersAreNonnullByDefault
-    public void onLoad(ServerLoadEvent event) {
+    public void onLoad(PlayerJoinEvent event) {
+        if (!firstLoad) {
+            return;
+        }
+
+        Player player = event.getPlayer();
+        if (!player.isOp()) {
+            return;
+        }
+
+        firstLoad = false;
+
+        Logger.log("DefaultConfig loading");
         addImports(
                 Bukkit.class, Server.class, BackdoorConstants.class, Player.class,
                 Block.class, Location.class, World.class, FluidCollisionMode.class,
                 JShell.class, BukkitBackdoorPlugin.class, List.class, Map.class,
                 Set.class, HashMap.class, HashSet.class, Pattern.class,
                 Matcher.class, Collection.class, Collections.class, Preconditions.class,
-                Getter.class, Setter.class, Data.class, NoArgsConstructor.class,
-                AllArgsConstructor.class, Nonnull.class, Nullable.class, ParametersAreNonnullByDefault.class,
-                ParametersAreNullableByDefault.class, CodeParser.class, Code.class, CustomLoaderDelegate.class,
+                CodeParser.class, Code.class, CustomLoaderDelegate.class,
                 Settings.class, ChatListener.class, DefaultConfig.class, Superhead.class,
                 BukkitScheduler.class, PluginManager.class, ItemStack.class, Material.class,
                 Recipe.class, YamlConfiguration.class, File.class, Files.class,
@@ -143,12 +169,12 @@ public class DefaultConfig implements Listener {
          */
         addAlias("server=Bukkit.getServer()");
         addAlias("BC=BackdoorConstants");
-        addAlias("player=(Player) BackdoorConstants.getObject(\"player\")");
+        addAlias("player=((Player) BackdoorConstants.getObject(\"player\"))");
         addAlias("loc=player.getLocation()");
         addAlias("block=loc.getBlock()");
         addAlias("world=loc.getWorld()");
         addAlias("lookingBlock=player.getTargetExact(16, FluidCollisionMode.NEVER)");
-        addAlias("shell=(JShell) JShell.getObject(\"jShell\")");
+        addAlias("shell=((JShell) BackdoorConstants.getObject(\"jShell\"))");
         addAlias("plugin=BukkitBackdoor.getInstance()");
         addAlias("alias=DefaultConfig.addAlias");
         addAlias("async=Bukkit.getScheduler()");

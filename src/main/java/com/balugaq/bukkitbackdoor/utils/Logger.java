@@ -1,12 +1,13 @@
-package com.balugaq.bukkitbackdoor;
+package com.balugaq.bukkitbackdoor.utils;
 
+import com.balugaq.bukkitbackdoor.implementation.BukkitBackdoorPlugin;
 import lombok.experimental.UtilityClass;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @UtilityClass
 public class Logger {
-    public static final java.util.logging.Logger logger = BukkitBackdoor.getInstance().getLogger();
+    public static final java.util.logging.Logger logger = BukkitBackdoorPlugin.getInstance().getLogger();
 
     @ParametersAreNonnullByDefault
     public static void log(Object... message) {

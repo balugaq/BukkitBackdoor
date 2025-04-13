@@ -1,11 +1,11 @@
-package com.balugaq.bukkitbackdoor;
+package com.balugaq.bukkitbackdoor.utils;
 
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class Superhead {
     public static final String PART_1 = """
-
+            
                  ___           ___           ___           ___
                 /\\  \\         /\\  \\         /\\  \\         /\\__\\
                /::\\  \\       /::\\  \\       /::\\  \\       /:/  /
@@ -18,7 +18,7 @@ public class Superhead {
                \\::/__/        /:/  /       \\:\\__\\        |:|  |
                 \\/__/         \\/__/         \\|__|         \\|__|""";
     public static final String PART_2 = """
-
+            
                  ___           ___           ___           ___
                 /\\  \\         /\\  \\         /\\  \\         /\\  \\
                /::\\  \\       /::\\  \\       /::\\  \\       /::\\  \\

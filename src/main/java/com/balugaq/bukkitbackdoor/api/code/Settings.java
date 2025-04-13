@@ -1,4 +1,4 @@
-package com.balugaq.bukkitbackdoor.code;
+package com.balugaq.bukkitbackdoor.api.code;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,4 +14,5 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @Builder
 public class Settings {
     public boolean timeit = false;
+    public boolean sync = false;
 }

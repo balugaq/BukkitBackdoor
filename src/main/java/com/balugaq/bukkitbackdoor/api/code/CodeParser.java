@@ -1,4 +1,4 @@
-package com.balugaq.bukkitbackdoor.code;
+package com.balugaq.bukkitbackdoor.api.code;
 
 import lombok.experimental.UtilityClass;
 

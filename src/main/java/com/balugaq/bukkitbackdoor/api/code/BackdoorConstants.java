@@ -1,4 +1,4 @@
-package com.balugaq.bukkitbackdoor.code;
+package com.balugaq.bukkitbackdoor.api.code;
 
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -21,7 +21,7 @@ public class BackdoorConstants {
     }
 
     @ParametersAreNonnullByDefault
-    public static void setObject(String key, Object value) {
+    public static void setMapping(String key, Object value) {
         mapping.put(key, value);
     }
 

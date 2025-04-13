@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.List;
 
 /**
  * This class is responsible for managing the configuration of the plugin.
@@ -32,6 +33,14 @@ public class ConfigManager {
 
         if (inputStream == null) {
             return;
+        }
+
+        if (!existingFile.exists()) {
+            try {
+                existingFile.createNewFile();
+            } catch (IOException e) {
+                return;
+            }
         }
 
         final Reader reader = new InputStreamReader(inputStream);
@@ -60,5 +69,17 @@ public class ConfigManager {
         } else if (currentValue == null) {
             existingConfig.set(key, newValue);
         }
+    }
+
+    public FileConfiguration getConfiguration() {
+        return plugin.getConfig();
+    }
+
+    public List<String> getStringList(String key) {
+        return getConfiguration().getStringList(key);
+    }
+
+    public boolean getBoolean(String key) {
+        return getConfiguration().getBoolean(key);
     }
 }

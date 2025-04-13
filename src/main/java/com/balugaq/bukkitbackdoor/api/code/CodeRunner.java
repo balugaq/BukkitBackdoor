@@ -21,6 +21,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -43,23 +44,38 @@ public class CodeRunner {
                 }, Map.of());
 
         jShell = builder.build();
-        FileUtils.forEachFiles(
-                BukkitBackdoorPlugin.getInstance().getDataFolder().getAbsoluteFile().toPath().resolveSibling("..").resolveSibling("..").resolve("libraries").normalize().toFile(),
-                ".jar",
-                path -> {
-                    try {
-                        Logger.log(StringUtils.HOOKED_PREFIX + path.toString());
-                        jShell.addToClasspath(path.toString());
-                    } catch (Throwable e) {
-                        Logger.stackTrace(e);
-                    }
-                });
-        String th = BukkitBackdoorPlugin.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-        th = URLDecoder.decode(th, StandardCharsets.UTF_8);
-        th = th.substring(1);
-        Logger.log(StringUtils.HOOKED_PREFIX + th);
-        // todo: load all jars with config-controlled folders / files (include, exclude)
-        jShell.addToClasspath(th);
+
+        List<String> extendPaths = BukkitBackdoorPlugin.getInstance().getConfigManager().getStringList("classpath.jars.folders");
+        for (String extendPath : extendPaths) {
+            FileUtils.forEachFiles(
+                    getPath(BukkitBackdoorPlugin.getInstance().getDataFolder().getAbsoluteFile().toPath(), extendPath).normalize().toFile(),
+                    ".jar",
+                    path -> {
+                        try {
+                            loadClasspath(jShell, path.toString());
+                        } catch (Throwable e) {
+                            Logger.stackTrace(e);
+                        }
+                    });
+        }
+
+        List<String> singleJars = BukkitBackdoorPlugin.getInstance().getConfigManager().getStringList("classpath.jars.singles");
+        for (String jarPath : singleJars) {
+            if ("this".equals(jarPath)) {
+                String th = BukkitBackdoorPlugin.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+                th = URLDecoder.decode(th, StandardCharsets.UTF_8);
+                th = th.substring(1);
+                loadClasspath(jShell, th);
+                continue;
+            }
+
+            loadClasspath(jShell, getPath(BukkitBackdoorPlugin.getInstance().getDataFolder().getAbsoluteFile().toPath(), jarPath).normalize().toString());
+        }
+
+        List<String> customs = BukkitBackdoorPlugin.getInstance().getConfigManager().getStringList("classpath.customs");
+        for (String custom : customs) {
+            loadClasspath(jShell, custom);
+        }
 
         BackdoorConstants.setMapping("server", Bukkit.getServer());
         BackdoorConstants.setMapping("jshell", jShell);
@@ -83,7 +99,7 @@ public class CodeRunner {
         int identifier = RANDOM.nextInt(0, Integer.MAX_VALUE);
         return "long __timeit_start_" + identifier + " = System.currentTimeMillis(); " +
                 code + "; " +
-                "player.sendMessage(\"Time Taken: \" + (System.currentTimeMillis() - __timeit_start_" + identifier + ") + \"ms\");";
+                "Logger.log(\"Time Taken: \" + (System.currentTimeMillis() - __timeit_start_" + identifier + ") + \"ms\");";
     }
 
     @ParametersAreNonnullByDefault
@@ -95,7 +111,7 @@ public class CodeRunner {
     @ParametersAreNonnullByDefault
     public static void runCode(JShell jShell, CommandSender sender, Code code) {
         String finalCode = code.getCode();
-        sender.sendMessage(StringUtils.color(StringUtils.J_SHELL_PROMPT + finalCode));
+        String displayCode = finalCode;
         if (CommandEnum.matches(finalCode, sender)) {
             return;
         }
@@ -108,7 +124,7 @@ public class CodeRunner {
         finalCode += ";";
 
         try {
-            check(jShell.eval(finalCode));
+            check(jShell.eval(finalCode), sender, displayCode);
         } catch (Throwable e) {
             Logger.stackTrace(e);
             sender.sendMessage(StringUtils.color(StringUtils.ERROR_PREFIX + e.getMessage()));
@@ -117,30 +133,61 @@ public class CodeRunner {
     }
 
     @ParametersAreNonnullByDefault
-    public static void check(List<SnippetEvent> events) {
+    public static void check(List<SnippetEvent> events, CommandSender sender, String displayCode) {
         events.forEach(event -> {
+            boolean sent = false;
             switch (event.status()) {
                 case REJECTED -> {
                     // compile failed
                     Logger.error(StringUtils.COMPILE_FAILED_PREFIX + event);
+                    sender.sendMessage(StringUtils.color("&c" + StringUtils.J_SHELL_PROMPT + StringUtils.COMPILE_FAILED_PREFIX + displayCode));
+                    sent = true;
                 }
                 case OVERWRITTEN -> {
                     switch (event.snippet().kind()) {
                         case IMPORT -> {
                             // over-import
                             Logger.warn(StringUtils.OVER_IMPORT_PREFIX + event);
+                            sender.sendMessage(StringUtils.color("&e" + StringUtils.J_SHELL_PROMPT + StringUtils.OVER_IMPORT_PREFIX + displayCode));
+                            sent = true;
                         }
                         case VAR -> {
                             // over-define
                             Logger.warn(StringUtils.OVER_DEFINE_PREFIX + event);
+                            sender.sendMessage(StringUtils.color("&e" + StringUtils.J_SHELL_PROMPT + StringUtils.OVER_DEFINE_PREFIX + displayCode));
+                            sent = true;
                         }
                     }
                 }
             }
             if (event.exception() != null) {
                 Logger.error(StringUtils.ERROR_PREFIX + event);
+                sender.sendMessage(StringUtils.color("&c" + StringUtils.J_SHELL_PROMPT + StringUtils.ERROR_PREFIX + displayCode));
+                sender.sendMessage(event.exception().getMessage());
+                sent = true;
+            }
+
+            if (!sent) {
+                sender.sendMessage(StringUtils.color("&a" + StringUtils.J_SHELL_PROMPT + displayCode));
             }
         });
+    }
+
+    public static void loadClasspath(JShell jShell, String classpath) {
+        try {
+            jShell.addToClasspath(classpath);
+            Logger.log(StringUtils.HOOKED_PREFIX + classpath);
+        } catch (Throwable e) {
+            Logger.stackTrace(e);
+        }
+    }
+
+    public static Path getPath(Path original, String extendPath) {
+        String[] parts = extendPath.split("/");
+        for (String part : parts) {
+            original = original.resolve(part);
+        }
+        return original;
     }
 
 }

@@ -1,2 +1,166 @@
-# todo: debug logs
 debug: false
+
+# What modules to load when plugin is enabled
+classpath:
+  jars:
+    # @plugins/BukkitBackdoor/ by default
+    folders:
+      # All jars in ../../libraries
+      - ../../libraries
+    singles:
+      # this = BukkitBackdoor.jar
+      - this
+      # - ./spark.jar
+  customs: []
+
+# What classes to import when plugin is enabled
+imports:
+  - org.bukkit.Bukkit
+  - org.bukkit.Server
+  - com.balugaq.bukkitbackdoor.api.code.BackdoorConstants
+  - org.bukkit.entity.Player
+  - org.bukkit.block.Block
+  - org.bukkit.Location
+  - org.bukkit.World
+  - org.bukkit.FluidCollisionMode
+  - jdk.jshell.JShell
+  - com.balugaq.bukkitbackdoor.implementation.BukkitBackdoorPlugin
+  - java.util.List
+  - java.util.Map
+  - java.util.Set
+  - java.util.HashMap
+  - java.util.HashSet
+  - java.util.regex.Pattern
+  - java.util.regex.Matcher
+  - java.util.Collection
+  - java.util.Collections
+  - com.google.common.base.Preconditions
+  - com.balugaq.bukkitbackdoor.api.code.CodeParser
+  - com.balugaq.bukkitbackdoor.api.code.Code
+  - com.balugaq.bukkitbackdoor.api.code.CustomLoaderDelegate
+  - com.balugaq.bukkitbackdoor.api.code.Settings
+  - com.balugaq.bukkitbackdoor.core.listeners.ChatListener
+  - com.balugaq.bukkitbackdoor.core.listeners.DefaultConfig
+  - com.balugaq.bukkitbackdoor.utils.Superhead
+  - org.bukkit.scheduler.BukkitScheduler
+  - org.bukkit.Material
+  - org.bukkit.material.MaterialData
+  - org.bukkit.inventory.Recipe
+  - org.bukkit.configuration.file.YamlConfiguration
+  - java.io.File
+  - java.nio.file.Files
+  - java.nio.file.Path
+  - java.nio.file.Paths
+  - java.lang.Class
+  - java.lang.Runnable
+  - java.lang.Thread
+  - java.util.function.Consumer
+  - java.util.function.Function
+  - java.util.function.Supplier
+  - com.balugaq.bukkitbackdoor.api.objects.Pair
+  - com.balugaq.bukkitbackdoor.utils.ReflectionUtils
+  - java.lang.reflect.Field
+  - java.lang.reflect.Method
+  - java.lang.reflect.Constructor
+  - java.lang.invoke.MethodHandle
+  - java.lang.invoke.MethodHandles
+  - java.lang.invoke.VarHandle
+  - org.bukkit.inventory.meta.ItemMeta
+  - org.bukkit.enchantments.Enchantment
+  - org.bukkit.Color
+  - org.bukkit.inventory.meta.Damageable
+  - org.bukkit.inventory.ItemFactory
+  - org.bukkit.inventory.ItemStack
+
+# Simplified macro definitions
+# Variables definition:
+#     varName=varValue
+# ex:
+#     server=Bukkit.getServer()
+#
+# Function definition:
+#     funcName=funcQuote
+# ex:
+#     alias=DefaultConfig.addAlias
+aliases:
+  - server=Bukkit.getServer()
+  - BC=BackdoorConstants
+  - player=((Player) BC.getObject(\"player\"))
+  - loc=player.getLocation()
+  - block=loc.getBlock()
+  - world=loc.getWorld()
+  - lookingBlock=player.getTargetExact(16, FluidCollisionMode.NEVER)
+  - shell=((JShell) BC.getObject(\"jShell\"))
+  - plugin=BukkitBackdoorPlugin.getInstance()
+  - alias=DefaultConfig.addAlias
+  - async=Bukkit.getScheduler()
+  - pluginManager=Bukkit.getPluginManager()
+  - sout=System.out.println
+  - slot0=BC.getObject(\"slot0\")
+  - slot1=BC.getObject(\"slot1\")
+  - slot2=BC.getObject(\"slot2\")
+  - slot3=BC.getObject(\"slot3\")
+  - slot4=BC.getObject(\"slot4\")
+  - slot5=BC.getObject(\"slot5\")
+  - slot6=BC.getObject(\"slot6\")
+  - slot7=BC.getObject(\"slot7\")
+  - slot8=BC.getObject(\"slot8\")
+  - slot9=BC.getObject(\"slot9\")
+  - slot10=BC.getObject(\"slot10\")
+  - slot11=BC.getObject(\"slot11\")
+  - slot12=BC.getObject(\"slot12\")
+  - slot13=BC.getObject(\"slot13\")
+  - slot14=BC.getObject(\"slot14\")
+  - slot15=BC.getObject(\"slot15\")
+  - slot16=BC.getObject(\"slot16\")
+  - slot17=BC.getObject(\"slot17\")
+  - slot18=BC.getObject(\"slot18\")
+  - slot19=BC.getObject(\"slot19\")
+  - slot20=BC.getObject(\"slot20\")
+  - slot21=BC.getObject(\"slot21\")
+  - slot22=BC.getObject(\"slot22\")
+  - slot23=BC.getObject(\"slot23\")
+  - slot24=BC.getObject(\"slot24\")
+  - slot25=BC.getObject(\"slot25\")
+  - slot26=BC.getObject(\"slot26\")
+  - slot27=BC.getObject(\"slot27\")
+  - slot28=BC.getObject(\"slot28\")
+  - slot29=BC.getObject(\"slot29\")
+  - slot30=BC.getObject(\"slot30\")
+  - slot31=BC.getObject(\"slot31\")
+  - slot32=BC.getObject(\"slot32\")
+  - slot33=BC.getObject(\"slot33\")
+  - slot34=BC.getObject(\"slot34\")
+  - slot35=BC.getObject(\"slot35\")
+  - slot36=BC.getObject(\"slot36\")
+  - slot37=BC.getObject(\"slot37\")
+  - slot38=BC.getObject(\"slot38\")
+  - slot39=BC.getObject(\"slot39\")
+  - slot40=BC.getObject(\"slot40\")
+  - slot41=BC.getObject(\"slot41\")
+  - slot42=BC.getObject(\"slot42\")
+  - slot43=BC.getObject(\"slot43\")
+  - slot44=BC.getObject(\"slot44\")
+  - slot45=BC.getObject(\"slot45\")
+  - slot46=BC.getObject(\"slot46\")
+  - slot47=BC.getObject(\"slot47\")
+  - slot48=BC.getObject(\"slot48\")
+  - slot49=BC.getObject(\"slot49\")
+  - slot50=BC.getObject(\"slot50\")
+  - slot51=BC.getObject(\"slot51\")
+  - slot52=BC.getObject(\"slot52\")
+  - slot53=BC.getObject(\"slot53\")
+  - slot54=BC.getObject(\"slot54\")
+  - slot55=BC.getObject(\"slot55\")
+  - slot56=BC.getObject(\"slot56\")
+  - slot57=BC.getObject(\"slot57\")
+  - slot58=BC.getObject(\"slot58\")
+  - slot59=BC.getObject(\"slot59\")
+  - slot60=BC.getObject(\"slot60\")
+  - slot61=BC.getObject(\"slot61\")
+  - slot62=BC.getObject(\"slot62\")
+  - slot63=BC.getObject(\"slot63\")
+  - \=/
+
+# What commands to execute in JShell when the plugin is enabled
+commands: []

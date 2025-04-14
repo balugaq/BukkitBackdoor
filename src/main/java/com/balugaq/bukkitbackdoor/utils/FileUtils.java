@@ -2,8 +2,11 @@ package com.balugaq.bukkitbackdoor.utils;
 
 import lombok.experimental.UtilityClass;
 
+import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
@@ -30,6 +33,17 @@ public class FileUtils {
             if (dir.getName().endsWith(suffix)) {
                 consumer.accept(dir.toPath());
             }
+        }
+    }
+
+    @ParametersAreNonnullByDefault
+    @Nonnull
+    public static String readFile(Path path) {
+        try {
+            return new String(Files.readAllBytes(path));
+        } catch (IOException e) {
+            Logger.stackTrace(e);
+            return "";
         }
     }
 }

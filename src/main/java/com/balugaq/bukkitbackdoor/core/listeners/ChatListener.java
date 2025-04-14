@@ -76,7 +76,7 @@ public class ChatListener implements Listener {
             loadReplacements(apce);
         }
 
-        CodeRunner.runCode(CodeRunner.jShell, sender, CodeParser.parse(message));
+        CodeRunner.runCode(CodeRunner.getJShell(), sender, CodeParser.parse(message));
     }
 
     @ParametersAreNonnullByDefault

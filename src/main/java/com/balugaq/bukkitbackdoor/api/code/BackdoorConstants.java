@@ -17,7 +17,7 @@ public class BackdoorConstants {
 
     @ParametersAreNonnullByDefault
     @Nonnull
-    public static Object getObject(String key) {
+    public static Object getObject0(String key) {
         return mapping.get(key);
     }
 
@@ -33,5 +33,15 @@ public class BackdoorConstants {
     @Nonnull
     public static Set<String> keys() {
         return mapping.keySet();
+    }
+
+    @ParametersAreNonnullByDefault
+    @Nullable
+    public static <T> T getObject(@Nonnull String key) {
+        try {
+            return (T) getObject0(key);
+        } catch (ClassCastException e) {
+            return null;
+        }
     }
 }

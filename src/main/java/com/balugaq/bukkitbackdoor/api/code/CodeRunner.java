@@ -49,6 +49,12 @@ public class CodeRunner {
 
         List<String> extendPaths = BukkitBackdoorPlugin.getInstance().getConfigManager().getStringList("classpath.jars.folders");
         for (String extendPath : extendPaths) {
+            boolean deep = false;
+            if (extendPath.startsWith("deep:")) {
+                deep = true;
+                extendPath = extendPath.substring(5);
+            }
+
             FileUtils.forEachFiles(
                     getPath(BukkitBackdoorPlugin.getInstance().getDataFolder().getAbsoluteFile().toPath(), extendPath).normalize().toFile(),
                     ".jar",
@@ -58,7 +64,7 @@ public class CodeRunner {
                         } catch (Throwable e) {
                             Logger.stackTrace(e);
                         }
-                    });
+                    }, deep);
         }
 
         List<String> singleJars = BukkitBackdoorPlugin.getInstance().getConfigManager().getStringList("classpath.jars.singles");
@@ -91,23 +97,37 @@ public class CodeRunner {
         }
         if (settings.isSync()) {
             code = generateSynchronizedCode(code);
+        } else {
+            code = generateAsynchronizedCode(code);
         }
         return code;
     }
 
     @ParametersAreNonnullByDefault
     @Nonnull
+    public static String multilineSupport(String code) {
+        return "((Runnable) (() -> {" + code + ";})).run()";
+    }
+
+    @ParametersAreNonnullByDefault
+    @Nonnull
     public static String generateTimedCode(String code) {
         int identifier = RANDOM.nextInt(0, Integer.MAX_VALUE);
-        return "long __timeit_start_" + identifier + " = System.currentTimeMillis(); " +
+        return "long __timeit_start_" + identifier + " = System.nanoTime(); " +
                 code + "; " +
-                "Logger.log(\"Time Taken: \" + (System.currentTimeMillis() - __timeit_start_" + identifier + ") + \"ms\");";
+                "Logger.log(\"Time Taken: \" + (System.nanoTime() - __timeit_start_" + identifier + ") / 1_000_000D + \"ms\");";
     }
 
     @ParametersAreNonnullByDefault
     @Nonnull
     public static String generateSynchronizedCode(String code) {
         return "async.runTask(plugin, () -> {" + code + ";})";
+    }
+
+    @ParametersAreNonnullByDefault
+    @Nonnull
+    public static String generateAsynchronizedCode(String code) {
+        return "async.runTaskAsynchronously(plugin, () -> {" + code + ";})";
     }
 
     @ParametersAreNonnullByDefault
@@ -120,6 +140,7 @@ public class CodeRunner {
 
         if (!finalCode.startsWith("import ")) { // Avoid replace imports
             Settings settings = code.getSettings();
+            finalCode = multilineSupport(finalCode);
             finalCode = handleSettings(settings, finalCode);
             finalCode = DefaultConfig.applyReplacements(finalCode);
         }

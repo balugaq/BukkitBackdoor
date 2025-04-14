@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.balugaq.bukkitbackdoor</groupId>
     <artifactId>BukkitBackdoor</artifactId>
-    <version>0.3</version>
+    <version>0.4</version>
 
     <pluginRepositories>
         <pluginRepository>

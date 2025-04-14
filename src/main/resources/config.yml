@@ -1,13 +1,17 @@
 # Whether to enable debug mode
 debug: false
+# How many times to retry to apply replacements to a command
+max-replacement-retry-times: 10
 
 # What modules to load when plugin is enabled
 classpath:
   jars:
-    # @plugins/BukkitBackdoor/ by default
+    # @ROOT/plugins/BukkitBackdoor/ by default
     folders:
-      # All jars in ../../libraries
-      - ../../libraries
+      # All jars in ROOT/libraries
+      - deep:../../libraries
+      # All jars in ROOT/plugins
+      - ../
     singles:
       # this = BukkitBackdoor.jar
       - this
@@ -101,6 +105,8 @@ aliases:
   - async=Bukkit.getScheduler()
   - pluginManager=Bukkit.getPluginManager()
   - sout=System.out.println
+  - currentms=bcget(\"currentms\")
+  - currentns=bcget(\"currentns\")
   - slot0=((ItemStack) bcget(\"slot0\"))
   - slot1=((ItemStack) bcget(\"slot1\"))
   - slot2=((ItemStack) bcget(\"slot2\"))

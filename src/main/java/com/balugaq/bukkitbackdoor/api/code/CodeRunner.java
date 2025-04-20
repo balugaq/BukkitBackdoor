@@ -142,7 +142,9 @@ public class CodeRunner {
             Settings settings = code.getSettings();
             finalCode = multilineSupport(finalCode);
             finalCode = handleSettings(settings, finalCode);
-            finalCode = DefaultConfig.applyReplacements(finalCode);
+            if (settings.isReplacement()) {
+                finalCode = DefaultConfig.applyReplacements(finalCode);
+            }
         }
         finalCode += ";";
 

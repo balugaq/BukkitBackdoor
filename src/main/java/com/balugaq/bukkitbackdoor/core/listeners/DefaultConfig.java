@@ -90,7 +90,7 @@ public class DefaultConfig implements Listener {
 
             for (Map.Entry<String, String> entry : replacements.entrySet()) {
                 // 假设为 key = player, origin = player.getPlayer(player)
-                String regex = entry.getKey() + "?([.,() +\\-*/;<>?:%\\n\\t])";
+                String regex = entry.getKey() + "([.,() +\\-*/;<>?:%\\n\\t])?";
                 // 将 player 替换为 value, 最后一个字符 ) 和 . 保留
                 origin = origin.replaceFirst(regex, entry.getValue() + "$1");
             }

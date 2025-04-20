@@ -15,4 +15,5 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class Settings {
     private boolean timeit = false;
     private boolean sync = false;
+    private boolean replacement = true;
 }

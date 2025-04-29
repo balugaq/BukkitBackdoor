@@ -59,12 +59,7 @@ public class ChatListener implements Listener {
         }
 
         if (message.equals("!!jshell")) {
-            // exit jShell
-            jShellingPlayers.remove(uuid);
-            sender.sendMessage(StringUtils.J_SHELL_EXIT_MESSAGE);
-            if (event != null) {
-                event.setCancelled(true);
-            }
+            exitJShell(sender, uuid, event);
             return;
         }
 
@@ -79,6 +74,15 @@ public class ChatListener implements Listener {
         CodeRunner.runCode(CodeRunner.getJShell(), sender, CodeParser.parse(message));
     }
 
+    public static void exitJShell(CommandSender sender, UUID uuid, Cancellable event) {
+        // exit jShell
+        jShellingPlayers.remove(uuid);
+        sender.sendMessage(StringUtils.J_SHELL_EXIT_MESSAGE);
+        if (event != null) {
+            event.setCancelled(true);
+        }
+    }
+
     @ParametersAreNonnullByDefault
     @EventHandler
     public void onChat(AsyncPlayerChatEvent event) {
@@ -89,5 +93,4 @@ public class ChatListener implements Listener {
         Player player = event.getPlayer();
         runCode(event, player, player.getUniqueId(), event.getMessage());
     }
-
 }

@@ -2,6 +2,7 @@ package com.balugaq.bukkitbackdoor.utils;
 
 import lombok.experimental.UtilityClass;
 import org.bukkit.ChatColor;
+import org.joml.Quaternionf;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -23,6 +24,7 @@ public class StringUtils {
     @ParametersAreNonnullByDefault
     @Nonnull
     public static String color(String string) {
+        Quaternionf
         return ChatColor.translateAlternateColorCodes('&', string);
     }
 }

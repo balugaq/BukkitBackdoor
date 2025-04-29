@@ -2,6 +2,7 @@ package com.balugaq.bukkitbackdoor.api.objects.enums;
 
 import com.balugaq.bukkitbackdoor.api.code.CodeParser;
 import com.balugaq.bukkitbackdoor.api.code.CodeRunner;
+import com.balugaq.bukkitbackdoor.core.listeners.ChatListener;
 import com.balugaq.bukkitbackdoor.core.listeners.DefaultConfig;
 import com.balugaq.bukkitbackdoor.implementation.BukkitBackdoorPlugin;
 import com.balugaq.bukkitbackdoor.utils.Constants;
@@ -19,15 +20,16 @@ public enum CommandEnum {
     KEYWORDS("kws", (sender) -> {
         sender.sendMessage(DefaultConfig.getReplacements().entrySet().stream().map(entry -> entry.getKey() + "=" + entry.getValue()).toList().toArray(new String[0]));
     }),
+    IMPORTS("imports", (sender) -> {
+        sender.sendMessage(String.join("\n", DefaultConfig.getImports().toArray(new String[0])));
+    }),
     VERSION("v", (sender) -> {
         sender.sendMessage("BukkitBackdoor v" + BukkitBackdoorPlugin.getInstance().getDescription().getVersion());
     }),
     EXIT("exit", (sender) -> {
         Bukkit.getScheduler().runTaskAsynchronously(BukkitBackdoorPlugin.getInstance(), () -> {
             if (sender instanceof Player player) {
-                Bukkit.getScheduler().runTaskAsynchronously(BukkitBackdoorPlugin.getInstance(), () -> {
-                    player.chat("!!jshell");
-                });
+                ChatListener.exitJShell(player, player.getUniqueId(), null);
             }
         });
     }),

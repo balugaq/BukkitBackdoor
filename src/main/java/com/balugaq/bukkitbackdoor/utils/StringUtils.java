@@ -24,7 +24,6 @@ public class StringUtils {
     @ParametersAreNonnullByDefault
     @Nonnull
     public static String color(String string) {
-        Quaternionf
         return ChatColor.translateAlternateColorCodes('&', string);
     }
 }
